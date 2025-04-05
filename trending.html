@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Citizen Complaint System</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 1rem;
+      background-color: #f3f4f6;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      padding: 1rem;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      margin: 0.5rem 0;
+    }
+
+    .language-switcher {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .language-switcher button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: #fff;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 2rem auto;
+    }
+
+    .card {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 0.8rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .gps-location {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .gps-location input {
+      flex: 1;
+    }
+
+    .upload-box {
+      padding: 1rem;
+      background: #eee;
+      border: 2px dashed #ccc;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .submit-btn {
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      width: 100%;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    .complaint-card {
+      padding: 1rem;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .complaint-card button {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    details summary {
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .chatbot {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--primary);
+      color: white;
+      padding: 1rem;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    img.preview {
+      width: 100px;
+      margin-top: 0.5rem;
+      border-radius: 4px;
+    }
+
+    @media (max-width: 600px) {
+      .gps-location {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1 id="title">Citizen Grievance System</h1>
+  <div class="language-switcher">
+    <button onclick="setLang('en')">English</button>
+    <button onclick="setLang('hi')">हिंदी</button>
+    <button onclick="setLang('kn')">ಕನ್ನಡ</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- Trending Complaints -->
+  <div class="card">
+    <h2 id="trendingTitle">Trending Complaints</h2>
+    <div id="complaintList"></div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="card">
+    <details>
+      <summary id="faqTitle">How to file a complaint?</summary>
+      <p id="faqDesc">Click submit after filling the form.</p>
+    </details>
+  </div>
+
+</div>
+
+<div class="chatbot">🤖</div>
+
+<script>
+  const translations = {
+    en: {
+      title: "Citizen Grievance System",
+      complaintTitle: "Complaint Title",
+      category: "Category",
+      location: "Location",
+      uploadImage: "Upload Image",
+      submit: "Submit Complaint",
+      trending: "Trending Complaints",
+      faqTitle: "How to file a complaint?",
+      faqDesc: "Click submit after filling the form.",
+      getGPS: "Get GPS",
+    },
+    hi: {
+      title: "नागरिक शिकायत प्रणाली",
+      complaintTitle: "शिकायत शीर्षक",
+      category: "श्रेणी",
+      location: "स्थान",
+      uploadImage: "छवि अपलोड करें",
+      submit: "शिकायत दर्ज करें",
+      trending: "प्रचलित शिकायतें",
+      faqTitle: "शिकायत कैसे दर्ज करें?",
+      faqDesc: "फॉर्म भरने के बाद सबमिट करें।",
+      getGPS: "जीपीएस प्राप्त करें",
+    },
+    kn: {
+      title: "ನಾಗರಿಕ ದೂರು ವ್ಯವಸ್ಥೆ",
+      complaintTitle: "ದೂರು ಶೀರ್ಷಿಕೆ",
+      category: "ವರ್ಗ",
+      location: "ಸ್ಥಳ",
+      uploadImage: "ಚಿತ್ರವನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ",
+      submit: "ದೂರು ಸಲ್ಲಿಸಿ",
+      trending: "ಟ್ರೆಂಡಿಂಗ್ ದೂರುಗಳು",
+      faqTitle: "ಹೆಗೆ ದೂರು ನೀಡುವುದು?",
+      faqDesc: "ಫಾರ್ಮ್ ಭರ್ತಿ ಮಾಡಿ ಮತ್ತು ಸಲ್ಲಿಸಿ.",
+      getGPS: "ಜಿಪಿಎಸ್ ಪಡೆಯಿರಿ",
+    }
+  };
+
+  let lang = 'en';
+  const complaints = [
+    { id: 1, title: "Pothole near School", location: "MG Road", upvotes: 12 },
+    { id: 2, title: "Street Light Broken", location: "BTM Layout", upvotes: 20 },
+    { id: 3, title: "Garbage Overflowing", location: "Indiranagar", upvotes: 18 },
+  ];
+
+  function renderComplaints() {
+    const list = document.getElementById("complaintList");
+    list.innerHTML = "";
+    complaints.sort((a, b) => b.upvotes - a.upvotes).forEach(comp => {
+      const card = document.createElement("div");
+      card.className = "complaint-card";
+      card.innerHTML = `
+        <h3>${comp.title}</h3>
+        <p>📍 ${comp.location}</p>
+        <button onclick="upvote(${comp.id})">👍 Upvote (${comp.upvotes})</button>
+      `;
+      list.appendChild(card);
+    });
+  }
+
+  function upvote(id) {
+    const c = complaints.find(c => c.id === id);
+    if (c) c.upvotes++;
+    renderComplaints();
+  }
+
+  function setLang(newLang) {
+    lang = newLang;
+    const t = translations[lang];
+    document.getElementById("title").innerText = t.title;
+    document.getElementById("lblTitle").innerText = t.complaintTitle;
+    document.getElementById("lblCategory").innerText = t.category;
+    document.getElementById("lblLocation").innerText = t.location;
+    document.getElementById("lblUpload").innerText = t.uploadImage;
+    document.getElementById("submitBtn").innerText = t.submit;
+    document.getElementById("trendingTitle").innerText = t.trending;
+    document.getElementById("faqTitle").innerText = t.faqTitle;
+    document.getElementById("faqDesc").innerText = t.faqDesc;
+  }
+
+  function getGPS() {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        document.getElementById("locationInput").value = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+      },
+      (err) => {
+        alert("GPS access denied.");
+      }
+    );
+  }
+
+  function previewImage(event) {
+    const img = document.getElementById("preview");
+    img.src = URL.createObjectURL(event.target.files[0]);
+    img.style.display = "block";
+  }
+
+  // Initialize
+  renderComplaints();
+</script>
+
+</body>
+</html>
